@@ -1,0 +1,5 @@
+1) print out datacards for each bin
+   function: input: mass point, bin number
+     ---> printdatacard.py
+2) main function to call printdatacard for all bins and make datacard for one masspoint using combine.py
+3) combine -M ProfileLikelihood

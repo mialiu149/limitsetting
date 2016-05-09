@@ -1,0 +1,27 @@
+# My significance experiment
+imax  1  number of channels
+jmax  4  number of backgrounds
+kmax  10  number of nuisance parameters
+------------
+# observations 
+bin         1
+observation 21
+------------
+#now we list all expected number of events
+bin          1       1       1       1       1       
+process     sig       2l       1l       1ltop       znunu
+process      0     1    2    3       4
+rate        11.0358  19.2686  0.51  0.67  0.62978
+------------
+SigStat2     lnN 1.20  -  -  -  -
+Bg2lStat2    lnN -  1.23  -  -  -
+Bg1lStat2    lnN -  -  1.15  -  -
+Bg1ltopStat2 lnN -  -  -  1.1  -
+BgwzStat2    lnN -  -  -  -  1.06
+MCSystSig      lnN 1.15786  -  -  -  -
+MCSyst2l        lnN  -  1.30 -  -  -
+MCSyst1l        lnN  -  - 1.30  -  -
+MCSyst1ltop     lnN  -  - - 1.30 -
+MCSystwz        lnN  -  - - - 1.30 
+
+

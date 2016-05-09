@@ -1,0 +1,23 @@
+imax  1  number of channels
+jmax  4  number of backgrounds
+kmax  10  number of nuisance parameters
+------------
+# observations
+bin        1
+observation  2
+#now we list all expected number of events
+bin 1 1 1 1 1 
+process     sig       2l       1l       1ltop       diboson
+process      0     1    2    3       4
+rate 0.0 0.0 0.0 0.0 0.0
+------------
+SigStat0 lnN 0 - - - -
+Bg2lStat0  lnN - 0  -  -  -
+Bg1lStat0  lnN - - 0  -  - 
+Bg1ltopStat0  lnN  -  -  - 0  -
+BgdibosonStat0  lnN  -  -  -  - 0
+MCSystSig       lnN 1.15  -  -  -  -
+MCSyst2l        lnN  -  1.30 -  -  -
+MCSyst1l        lnN  -  - 1.30  -  -
+MCSyst1ltop     lnN  -  - - 1.30 -
+MCSystdiboson   lnN  -  - - - 1.30
