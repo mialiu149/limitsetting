@@ -1,1 +1,2 @@
-source ~/AnalysisLoopers2015/wh_loopers/setup.sh
+source ~/AnalysisLoopers_80x/wh_loopers/setup.sh
+cmsenv

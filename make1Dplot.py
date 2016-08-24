@@ -17,7 +17,7 @@ def get1Dxsec(charginomass):
     fxsec = ROOT.TFile.Open("xsec_susy_13tev.root")
     hxsec = fxsec.Get("h_xsec_c1n2")
     sigma = hxsec.GetBinContent(hxsec.FindBin(charginomass)) 
-    return sigma*1000
+    return sigma
     
 def main():
     version = "scan13fbv2"
@@ -26,7 +26,9 @@ def main():
     #chargino_masses =[126,150,175,200,225,250,275,300,325,350,375,400] 
     chargino_masses =[126,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700] 
 #    chargino_masses =[126]
-     
+    f_xsecgraph = ROOT.TFile.Open("xsec_susy_13tev_graphs.root")
+    g_xsec_c1n2 = f_xsecgraph.Get("g_xsec_c1n2")
+
     obs=[]
     exp=[]
     m2s=[]
@@ -68,14 +70,14 @@ def main():
     padt.Draw()
     padt.cd()
     padt.SetLogy() 
-    h = ROOT.TH2F("h","h",48,100,700,1000000,0,1000000)
+    h = ROOT.TH2F("h","h",48,100,700,1000,0.001,1000)
     h.SetTitle("")
-    h.GetXaxis().SetTitle("M_{#tilde{#chi}^{#pm}_{1}} = M_{#tilde{#chi}^{0}_{2}}(GeV)")
-    h.GetYaxis().SetTitle("#sigma limit at 95% CL (fb)")
+    h.GetXaxis().SetTitle("m_{#tilde{#chi}^{#pm}_{1}} = m_{#tilde{#chi}^{0}_{2}} [GeV]")
+    h.GetYaxis().SetTitle("#sigma limit at 95% CL [pb]")
     h.GetXaxis().SetLabelSize(0.04)
     h.GetYaxis().SetLabelSize(0.04)
-    h.GetXaxis().SetTitleSize(0.045)
-    h.GetYaxis().SetTitleSize(0.045)
+    h.GetXaxis().SetTitleSize(0.042)
+    h.GetYaxis().SetTitleSize(0.042)
     h.GetXaxis().SetTitleOffset(1.0)
     h.GetYaxis().SetTitleOffset(1.5)
     h.Draw()
@@ -98,8 +100,9 @@ def main():
     gsigmas.SetLineStyle(7)
     gsigmas.SetLineWidth(3)
     gsigmas.SetLineColor(ROOT.kRed)
-    gsigmas.Draw("L")
-
+#    gsigmas.Draw("L")
+    g_xsec_c1n2.SetFillColor(ROOT.kMagenta)
+    g_xsec_c1n2.Draw("3 same")
     gobs = ROOT.TGraph(len(chargino_masses), array.array('d', chargino_masses), array.array('d', obs))
     gobs.SetMarkerStyle(ROOT.kFullCircle)
     gobs.SetMarkerSize(1.5)
@@ -107,8 +110,22 @@ def main():
     gobs.SetLineWidth(3)
     gobs.SetLineColor(ROOT.kBlack)
     gobs.Draw("PL")
-    
-    cmstex = ROOT.TLatex(0.675,0.91, "%.2f fb^{-1} (13 TeV)" % lumi)
+   
+    prctex = ROOT.TLatex(0.45,0.83, "pp #rightarrow #tilde{#chi}^{#pm}_{1} #tilde{#chi}^{0}_{2}; m_{#tilde{#chi}^{0}_{1}} = 1 GeV");
+    prctex.SetNDC()    
+    prctex.SetTextSize(0.032)    
+    prctex.SetLineWidth(2)
+    prctex.SetTextFont(42)    
+    prctex.Draw()
+
+    prctex2 = ROOT.TLatex(0.45,0.77, "#tilde{#chi}^{#pm}_{1}#rightarrow W^{#pm} #tilde{#chi}_{1}^{0}, #tilde{#chi}^{0}_{2}#rightarrow H #tilde{#chi}_{1}^{0}" );    
+    prctex2.SetNDC()    
+    prctex2.SetTextSize(0.032)    
+    prctex2.SetLineWidth(2)
+    prctex2.SetTextFont(42)    
+    prctex2.Draw()
+ 
+    cmstex = ROOT.TLatex(0.675,0.91, "%.1f fb^{-1} (13 TeV)" % lumi)
     cmstex.SetNDC()
     cmstex.SetTextSize(0.04)
     cmstex.SetLineWidth(2)
@@ -129,17 +146,18 @@ def main():
     cmstexprel.SetTextFont(52)
     cmstexprel.Draw()
     
-    l1 = ROOT.TLegend(0.35, 0.65, 0.95, 0.90)
+    l1 = ROOT.TLegend(0.45, 0.55, 0.9, 0.74)
     l1.SetTextFont(42)
     l1.SetTextSize(0.036)
+    l1.SetLineColor(ROOT.kWhite)
     l1.SetShadowColor(ROOT.kWhite)
     l1.SetFillColor(ROOT.kWhite)
-    l1.SetHeader("#sigma exclusion limit, M_{#tilde{#chi}^{0}_{1}} = 1 GeV")
+#    l1.SetHeader("#sigma exclusion limit, M_{#tilde{#chi}^{0}_{1}} = 1 GeV")
     l1.AddEntry(gobs , "Observed", "lp")
     l1.AddEntry(gexp , "Expected", "l")
     l1.AddEntry(gr_s1b , "Expected #pm 1 #sigma", "f")
     l1.AddEntry(gr_s2b , "Expected #pm 2 #sigma", "f")
-    l1.AddEntry(gsigmas , "Theoretical #sigma_{NLO}","l")
+    l1.AddEntry(g_xsec_c1n2 , "Theoretical #sigma_{NLO+NLL}","f")
     l1.Draw()
     '''
     LExp1 = ROOT.TGraphAsymmErrors(2)
