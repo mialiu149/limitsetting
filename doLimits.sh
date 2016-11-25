@@ -4,9 +4,8 @@
 
 cmsenv
 
-#INDIR=/home/users/olivito/mt2_74x_dev/MT2Analysis/scripts/cards_scantest
-INDIR=/home/users/mliu/CMSSW_7_4_7/src/limitsetting_whmet/cardsv2
-OUTDIR=scan13fbv2
+INDIR=/home/users/mliu/CMSSW_7_4_7/src/limitsetting_whmet/cards_40fb_v8
+OUTDIR=scan40fbv8
 
 #declare -a samples=(T1tttt_1500_100 T1tttt_1200_800 T1bbbb_1500_100 T1bbbb_1000_900 T1qqqq_1400_100 T1qqqq_1000_800 T2tt_850_100 T2tt_650_325 T2tt_500_325 T2tt_425_325 T2bb_900_100 T2bb_600_580 T2qq_1200_100 T2qq_600_550)
 #declare -a samples=(T1tttt_1500_100 T1tttt_1200_800)

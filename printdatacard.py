@@ -1,6 +1,6 @@
 # get number of yields in a bin
 # print out data card
-from ROOT import TH1F,TFile
+from ROOT import TH1F,TFile,TH3D
 import os
 
 #def printcard(masspoint,masspointinfo,binN,backgrounds,errors,selection):
@@ -65,8 +65,23 @@ def getsignalscan():
         ybin = scanhist.GetYaxis().FindBin(mass[1]) 
         string=str(mass[0])+'_'+str(mass[1])
         scandict[string]={'yield': scanhist.GetBinContent(xbin,ybin), 'stat': scanhist.GetBinError(xbin,ybin)} 
-    return scandict    
-     
+    return scandict   
+ 
+def getsignalscanmultibin(bin,selection):
+    histname="h_histscan"
+    filename = "SMS_tchwh_lnbb_"+selection+"_hists.root"
+    rootf = TFile(os.environ["analysis_output"]+"/"+filename)
+    scanhist = rootf.Get(histname)
+    
+    grid = getgrid() # print out the mass point string. 
+    scandict = {} # make a dictionary for masspoints
+
+    for mass in grid:
+        xbin = scanhist.GetXaxis().FindBin(mass[0]) 
+        ybin = scanhist.GetYaxis().FindBin(mass[1]) 
+        string=str(mass[0])+'_'+str(mass[1])
+        scandict[string]={'yield': scanhist.GetBinContent(xbin,ybin,bin), 'stat': scanhist.GetBinError(xbin,ybin,bin)} 
+         
 def getbackgrounds(selection):  #hardcoded for WH
     hist_prefix = 'h_lep_event_NEventsSROneBin_'+selection
     backgrounds = {'2l':[],'1l':[],'1ltop':[],'wzbb':[],'rare':[]}

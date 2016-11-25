@@ -1,0 +1,33 @@
+imax  1  number of channels
+jmax  6  number of backgrounds
+kmax  *  number of nuisance parameters
+------------
+# observations
+bin        1
+observation  8
+#now we list all expected number of events
+bin 1 1 1 1 1 1 1 
+process     sig       2ltop       WLF       1ltop       wzbb   rare WHF 
+process      0        1         2         3          4      5    6
+rate 4.79571272386 8.91821748391 0.0113482410088 0.308980956674 0.0344144813716 0.321004680474 0.572484486736
+------------
+SigStat0  lnN 1.05560344298 - - - - - -
+Bg2lStat0  lnN - 1.11132460447  -  -  -  - - 
+Bg1lStat0  lnN - - 2.0   -  -  - - 
+Bg1ltopStat0  lnN - -  - 1.35362017206 -  - - 
+BgwzbbStat0  lnN - -  -  - 1.8955902685 - - 
+BgrareStat0  lnN - -  -  -  - 1.28174215164 - 
+Bg1lHStats0  lnN - -  -  -  -  - 1.69486785363 
+Sigsyslumi         lnN 1.062  -  -  -  - - - 
+Sigsysbtagsf       lnN 1.02257629345  - - - - - -   
+Sigsysscale        lnN 1.00105578373  - - - - - -   
+Sigsyslepsf        lnN 1.02251911373  - - - - - -   
+Sigsysmet          lnN 1.04067521921  - - - - - -   
+Sigsystrig         lnN 1.01841190746  - - - - - -   
+Sigsysjec          lnN 1.02887297352  - - - - - -   
+MCSyst2ltop        lnN  -  1.20 -  -  - - - 
+MCSystWLF          lnN  -  - 1.20  -  - - - 
+MCSyst1ltop        lnN  -  - - 2.00   - - - 
+MCSystwzbb         lnN  -  - - - 1.30   - - 
+MCSystrare         lnN  -  - - - - 1.50   - 
+MCSystWHF          lnN  -  - - - - - 1.70   

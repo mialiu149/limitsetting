@@ -1,8 +1,7 @@
 import ROOT, array
 import sys, glob
 ROOT.gROOT.SetBatch(True)
-# function to 
-lumi = 12.9
+lumi = 40
 
 def get1Dlimit(fn): 
     f = ROOT.TFile.Open(fn)
@@ -20,9 +19,8 @@ def get1Dxsec(charginomass):
     return sigma
     
 def main():
-    version = "scan13fbv2"
+    version = "scan40fbv4"
     dir="/home/users/mliu/CMSSW_7_4_7/src/limitsetting_whmet/"+version+"/"
-    lumi=12.9
     #chargino_masses =[126,150,175,200,225,250,275,300,325,350,375,400] 
     chargino_masses =[126,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700] 
 #    chargino_masses =[126]
@@ -40,10 +38,16 @@ def main():
     
     for chargino in chargino_masses:
         fn = dir+'limit_tchwh_'+str(chargino)+'_1.root'
+        fnb = dir.replace("v4","v8")+'limit_tchwh_'+str(chargino)+'_1.root'
         limitsdic = get1Dlimit(fn)
+        limitsdicb = get1Dlimit(fnb)
         xsec = get1Dxsec(chargino)
-        obs.append(limitsdic['obs']*xsec)
+        #obs.append(limitsdic['obs']*xsec)
+        obs.append(limitsdicb['exp']*xsec)
+        #exp.append(limitsdic['exp']*xsec)
         exp.append(limitsdic['exp']*xsec)
+#        if chargino is 350:
+#           print limitsdicb['exp'],limitsdic['exp'] 
         m2s.append(limitsdic['m2s']*xsec)
         m1s.append(limitsdic['m1s']*xsec)
         p1s.append(limitsdic['p1s']*xsec)
@@ -106,10 +110,10 @@ def main():
     gobs = ROOT.TGraph(len(chargino_masses), array.array('d', chargino_masses), array.array('d', obs))
     gobs.SetMarkerStyle(ROOT.kFullCircle)
     gobs.SetMarkerSize(1.5)
-    gobs.SetMarkerColor(ROOT.kBlack)
+    gobs.SetMarkerColor(ROOT.kBlue)
     gobs.SetLineWidth(3)
-    gobs.SetLineColor(ROOT.kBlack)
-    gobs.Draw("PL")
+    gobs.SetLineColor(ROOT.kBlue)
+    gobs.Draw("L")
    
     prctex = ROOT.TLatex(0.45,0.83, "pp #rightarrow #tilde{#chi}^{#pm}_{1} #tilde{#chi}^{0}_{2}; m_{#tilde{#chi}^{0}_{1}} = 1 GeV");
     prctex.SetNDC()    
@@ -153,8 +157,9 @@ def main():
     l1.SetShadowColor(ROOT.kWhite)
     l1.SetFillColor(ROOT.kWhite)
 #    l1.SetHeader("#sigma exclusion limit, M_{#tilde{#chi}^{0}_{1}} = 1 GeV")
-    l1.AddEntry(gobs , "Observed", "lp")
-    l1.AddEntry(gexp , "Expected", "l")
+    #l1.AddEntry(gobs , "Observed", "lp")
+    l1.AddEntry(gobs , "b pt bin", "l")
+    l1.AddEntry(gexp , "40fb", "l")
     l1.AddEntry(gr_s1b , "Expected #pm 1 #sigma", "f")
     l1.AddEntry(gr_s2b , "Expected #pm 2 #sigma", "f")
     l1.AddEntry(g_xsec_c1n2 , "Theoretical #sigma_{NLO+NLL}","f")

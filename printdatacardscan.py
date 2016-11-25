@@ -56,7 +56,7 @@ def getgrid():
     return grid
 
 
-def getsignalscan(signalfile):
+def getsignalscan(signalfile,nzbins):
     # open  files
     histname="h_histscan"
     rootf = TFile(os.environ["analysis_output"]+"/"+signalfile)
@@ -77,42 +77,53 @@ def getsignalscan(signalfile):
     scanhist_trigdn  = rootf.Get('h_histscan_trigdn') 
     
     grid = getgrid() # print out the mass point string. 
-    scandict = {} # make a dictionary for masspoints
-
-    for mass in grid:
-        # find the mass points and name for the datacard
-        xbin = scanhist.GetXaxis().FindBin(mass[0]) 
-        ybin = scanhist.GetYaxis().FindBin(mass[1])         
-        namestring=str(mass[0])+'_'+str(mass[1]) 
-        # genmet resolution uncertainties.
-        recoyield = scanhist.GetBinContent(xbin,ybin)
-        recoerror = scanhist.GetBinError(xbin,ybin)
-        genyield = scanhist_genmet.GetBinContent(xbin,ybin)
-        generror = scanhist_genmet.GetBinError(xbin,ybin)
-        averagedyield = (recoyield+genyield)/2
-        averageerror  = sqrt(recoerror*recoerror+generror*generror)/2
-        # calculate relative uncertainties
-        centralyield = recoyield
-        meterror = abs(recoyield-genyield)/2
-        btagup = scanhist_btagsfup.GetBinContent(xbin,ybin)
-        btagdn = scanhist_btagsfdn.GetBinContent(xbin,ybin)
-        sysbtagsf = max(abs(btagup-centralyield)/centralyield,abs(btagdn-centralyield)/centralyield)+1
-        lepup = scanhist_lepsfup.GetBinContent(xbin,ybin) 
-        lepdn = scanhist_lepsfdn.GetBinContent(xbin,ybin) 
-        syslepsf = max(abs(lepup-centralyield)/centralyield,abs(lepdn-centralyield)/centralyield) +1
-        sysscale = max(scanhist_scaleup.GetBinContent(xbin,ybin)/centralyield,scanhist_scaledn.GetBinContent(xbin,ybin)/centralyield)
-        trigup = scanhist_trigup.GetBinContent(xbin,ybin) 
-        trigdn = scanhist_trigdn.GetBinContent(xbin,ybin) 
-        systrig  =max(abs(trigup-centralyield)/centralyield,abs(trigdn-centralyield)/centralyield)+1
-        jecup = scanhist_jecup.GetBinContent(xbin,ybin)
-        jecdn = scanhist_jecdn.GetBinContent(xbin,ybin)
-        sysjec = max(abs(jecup-centralyield)/centralyield,abs(jecdn-centralyield)/centralyield)+1 
-        scandict[namestring]={'yield': averagedyield, 'stat': recoerror/centralyield+1, 'sysmet':meterror/centralyield+1
-                              ,'sysbtagsf':sysbtagsf ,'syslepsf':syslepsf, 'sysscale':sysscale, 'systrig':systrig, 'sysjec':sysjec} 
-    return scandict    
+    scandicts = [] # make a dictionary for masspoints
+    
+    for zbin in range(1,nzbins+1):
+        scandict={}
+        for mass in grid:
+           # find the mass points and name for the datacard
+            xbin = scanhist.GetXaxis().FindBin(mass[0]) 
+            ybin = scanhist.GetYaxis().FindBin(mass[1])         
+            namestring=str(mass[0])+'_'+str(mass[1]) 
+           # genmet resolution uncertainties.
+            recoyield = scanhist.GetBinContent(xbin,ybin,zbin)
+            recoerror = scanhist.GetBinError(xbin,ybin,zbin)
+            genyield = scanhist_genmet.GetBinContent(xbin,ybin,zbin)
+            generror = scanhist_genmet.GetBinError(xbin,ybin,zbin)
+            averagedyield = (recoyield+genyield)/2
+            averageerror  = sqrt(recoerror*recoerror+generror*generror)/2
+           # calculate relative uncertainties
+            centralyield = recoyield
+            meterror = abs(recoyield-genyield)/2
+            sysbtagsf = 0
+            syslepsf=0
+            sysscale=0
+            systrig=0
+            sysjec=0
+            if centralyield:
+               btagup = scanhist_btagsfup.GetBinContent(xbin,ybin,zbin)
+               btagdn = scanhist_btagsfdn.GetBinContent(xbin,ybin,zbin)
+               sysbtagsf = max(abs(btagup-centralyield)/centralyield,abs(btagdn-centralyield)/centralyield)+1
+               lepup = scanhist_lepsfup.GetBinContent(xbin,ybin,zbin) 
+               lepdn = scanhist_lepsfdn.GetBinContent(xbin,ybin,zbin) 
+               syslepsf = max(abs(lepup-centralyield)/centralyield,abs(lepdn-centralyield)/centralyield) +1
+               sysscale = max(scanhist_scaleup.GetBinContent(xbin,ybin)/centralyield,scanhist_scaledn.GetBinContent(xbin,ybin)/centralyield)
+               trigup = scanhist_trigup.GetBinContent(xbin,ybin,zbin) 
+               trigdn = scanhist_trigdn.GetBinContent(xbin,ybin,zbin) 
+               systrig  =max(abs(trigup-centralyield)/centralyield,abs(trigdn-centralyield)/centralyield)+1
+               jecup = scanhist_jecup.GetBinContent(xbin,ybin,zbin)
+               jecdn = scanhist_jecdn.GetBinContent(xbin,ybin,zbin)
+               sysjec = max(abs(jecup-centralyield)/centralyield,abs(jecdn-centralyield)/centralyield)+1 
+               scandict[namestring]={'yield': averagedyield, 'stat': recoerror/centralyield+1, 'sysmet':meterror/centralyield+1
+                              ,'sysbtagsf':sysbtagsf ,'syslepsf':syslepsf, 'sysscale':sysscale, 'systrig':systrig, 'sysjec':sysjec}
+            else:
+                 scandict[namestring]={'yield': averagedyield, 'stat': 1, 'sysmet': 1,'sysbtagsf':sysbtagsf ,'syslepsf':syslepsf, 'sysscale':sysscale, 'systrig':systrig, 'sysjec':sysjec}
+        scandicts.append(scandict)      
+    return scandicts    
      
 def getbackgrounds(selection):  #hardcoded for WH
-    hist_prefix = 'h_lep_event_NEventsSROneBin_'+selection
+    hist_prefix = 'h_lep_event_NEventsSRMultiBin'
     backgrounds = {'2l':[],'1l':[],'1ltop':[],'wzbb':[],'rare':[]}
     errors = {'2l':[],'1l':[],'1ltop':[],'wzbb':[],'rare':[]}
     print "using inputs from:",os.environ["analysis_output"]
@@ -158,13 +169,15 @@ def getLimit(card):
 
 if __name__ == "__main__":
    # specify selection here to get a set of backgrounds
-   selection="SR_SROneBin_yield_mbb_mct150_mt150_met100_twobtag"
+   version='8'
+   zbins =2
+   selection="SR_SRMultiBin_V%s_yield_mbb_mct170_mt150_met100_twobtag_mix"%version
+   carddir = "cards_40fb_v%s"%version
    bkgs,err = getbackgrounds(selection) 
    # specify signal file here
-   signalfile = "SMS_tchwh_lnbb_SMS_SR_met100_mt150_mbb_mct150_twobtag_hists.root"
-   scandict = getsignalscan(signalfile)
+   signalfile = "SMS_tchwh_lnbb_"+selection+"_hists.root"
+   scandicts = getsignalscan(signalfile,zbins)
    # output directory for cards
-   carddir = "cardsv2"
     ### check if output cards exist
    if os.path.isdir(carddir): 
        overwritedir = raw_input("cards directory already exist, overwrite? (y/n)")
@@ -180,10 +193,14 @@ if __name__ == "__main__":
 
    cards = []
    sys ={'stat':[] , 'sysscale':[] , 'yield':[] , 'sysbtagsf':[] , 'syslepsf': [], 'sysmet':[],'systrig':[],'sysjec':[]} 
-   for k,kinfo in scandict.items():
-       card = printcard(k,kinfo,1,bkgs,err,selection,carddir)
-       for key in kinfo.keys():
-           sys[key].append(kinfo[key])
 
-   for item in sys.keys():
-       print item,':', max(sys[item]), min(sys[item])
+   for zbin in range(1,zbins+1):
+       print zbin
+       for k,kinfo in scandicts[zbin-1].items():
+       #for k,kinfo in scandicts[0].items():
+           card = printcard(k,kinfo,zbin,bkgs,err,selection,carddir)
+   #    for key in kinfo.keys():
+   #        sys[key].append(kinfo[key])
+
+#   for item in sys.keys():
+#       print item,':', max(sys[item]), min(sys[item])
