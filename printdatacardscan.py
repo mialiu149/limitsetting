@@ -3,10 +3,15 @@
 from ROOT import TH1F,TFile
 import os
 from math import sqrt
+import re
+def hasNumbers(inputString):
+    return bool(re.search(r'\d', inputString))
 
 def printcard(masspoint,masspointinfo,binN,backgrounds,errors,selection,carddir):
   
-    sigN,sigE = masspointinfo['yield'], masspointinfo['stat']  
+    sigN,sigE = masspointinfo['yield'], masspointinfo['stat'] 
+    if binN== 1: obs_data = 11
+    if binN==2: obs_data=7
     cardname = carddir+'/datacard_'+str(binN)+'_tchwh_'+masspoint+'.txt'
     card = open(cardname,'w')
     card.write("imax  1  number of channels\n")
@@ -15,7 +20,7 @@ def printcard(masspoint,masspointinfo,binN,backgrounds,errors,selection,carddir)
     card.write("------------\n")
     card.write("# observations\n")
     card.write("bin        "+str(binN)+'\n')
-    card.write("observation  " + str(8)+'\n')
+    card.write("observation  " + str(obs_data)+'\n')
     card.write("#now we list all expected number of events\n")
     bintoprint = str(binN)+' '
     card.write("bin "+7*bintoprint+'\n')
@@ -24,27 +29,32 @@ def printcard(masspoint,masspointinfo,binN,backgrounds,errors,selection,carddir)
     binI = binN-1
     card.write("rate " +str(sigN) +' ' + str(backgrounds['2l'][binI]) +' ' + str(backgrounds['1l'][binI])+' ' + str(backgrounds['1ltop'][binI])+' ' + str(backgrounds['wzbb'][binI])+' ' + str(backgrounds['rare'][binI])+ " "+str(backgrounds['1lH'][binI]))
     card.write("\n------------\n")
-    card.write("SigStat"    +str(binI)+"  lnN " +str(sigE)+' - - - - - -\n')
-    card.write("Bg2lStat"   +str(binI)+"  lnN - " +str(errors['2l'][binI])+'  -  -  -  - - \n')
-    card.write("Bg1lStat"   +str(binI)+"  lnN - - " +str(errors['1l'][binI])+'   -  -  - - \n')
-    card.write("Bg1ltopStat"+str(binI)+"  lnN - -  - " +str(errors['1ltop'][binI])+' -  - - \n')
-    card.write("BgwzbbStat" +str(binI)+"  lnN - -  -  - " +str(errors['wzbb'][binI])+' - - \n')
-    card.write("BgrareStat" +str(binI)+"  lnN - -  -  -  - " +str(errors['rare'][binI])+' - \n')
-    card.write("Bg1lHStats" +str(binI)+"  lnN - -  -  -  -  - " +str(errors['1lH'][binI])+' \n')
+    card.write("SigStat"    +str(binI)+"_WH "+"  lnN " +str(sigE)+' - - - - - -\n')
+    card.write("Bg2lStat"   +str(binI)+"_WH "+"  lnN - " +str(errors['2l'][binI])+'  -  -  -  - - \n')
+    card.write("Bg1lStat"   +str(binI)+"_WH "+"  lnN - - " +str(errors['1l'][binI])+'   -  -  - - \n')
+    card.write("Bg1ltopStat"+str(binI)+"_WH "+"  lnN - -  - " +str(errors['1ltop'][binI])+' -  - - \n')
+    card.write("BgwzbbStat" +str(binI)+"_WH "+"  lnN - -  -  - " +str(errors['wzbb'][binI])+' - - \n')
+    card.write("BgrareStat" +str(binI)+"_WH "+"  lnN - -  -  -  - " +str(errors['rare'][binI])+' - \n')
+    card.write("Bg1lHStats" +str(binI)+"_WH "+"  lnN - -  -  -  -  - " +str(errors['1lH'][binI])+' \n')
     #card.write("MCSystSig       lnN 1.15  -  -  -  - - - \n")
-    card.write("Sigsyslumi         lnN 1.062  -  -  -  - - - \n")
-    card.write('Sigsysbtagsf       lnN '+str(masspointinfo['sysbtagsf'])+'  - - - - - -   \n')
-    card.write('Sigsysscale        lnN '+str(masspointinfo['sysscale'])+'  - - - - - -   \n')
-    card.write('Sigsyslepsf        lnN '+str(masspointinfo['syslepsf'])+'  - - - - - -   \n')
-    card.write('Sigsysmet          lnN '+str(masspointinfo['sysmet'])+'  - - - - - -   \n')
+    card.write("lumi         lnN 1.026  -  -  -  - - - \n")
+    card.write('btag_HF       lnN '+str(masspointinfo['sysbtagsf'])+'  - - - - - -   \n')
+    #card.write('Sigsysscale        lnN '+str(masspointinfo['sysscale'])+'  - - - - - -   \n')
+    card.write('scale        lnN 1.02   - - - - - -   \n')
+    card.write('lepton_idiso        lnN 1.02   - - - - - -   \n')
+    card.write('lepton_FSsfs        lnN 1.03   - - - - - -   \n')
+#    card.write('lepton_FSsfs       lnN '+str(masspointinfo['syslepsf'])+'  - - - - - -   \n')
+    card.write('MET          lnN '+str(masspointinfo['sysmet'])+'  - - - - - -   \n')
     card.write('Sigsystrig         lnN '+str(masspointinfo['systrig'])+'  - - - - - -   \n')
-    card.write('Sigsysjec          lnN '+str(masspointinfo['sysjec'])+'  - - - - - -   \n')
-    card.write("MCSyst2ltop        lnN  -  1.20 -  -  - - - \n")
-    card.write("MCSystWLF          lnN  -  - 1.20  -  - - - \n")
-    card.write("MCSyst1ltop        lnN  -  - - 2.00   - - - \n")
-    card.write("MCSystwzbb         lnN  -  - - - 1.30   - - \n")
-    card.write("MCSystrare         lnN  -  - - - - 1.50   - \n")
-    card.write("MCSystWHF          lnN  -  - - - - - 1.70   \n")
+    card.write('JES          lnN '+str(masspointinfo['sysjec'])+'  - - - - - -   \n')
+    card.write('PUreweighting       lnN '+str(masspointinfo['syspileup'])+'  - - - - - -   \n')
+    card.write('ISR          lnN '+str(masspointinfo['sysisr'])+'  - - - - - -   \n')
+    card.write("MCSyst2ltop_WH        lnN  -  1.30 -  -  - - - \n")
+    card.write("MCSystWLF_WH          lnN  -  - 1.10  -  - - - \n")
+    card.write("MCSyst1ltop_WH        lnN  -  - - 2.00   - - - \n")
+    card.write("MCSystwzbb_WH         lnN  -  - - - 1.30   - - \n")
+    card.write("MCSystrare_WH         lnN  -  - - - - 1.50   - \n")
+    card.write("MCSystWHF_WH          lnN  -  - - - - - 1.52   \n")
 
     return 'cards/datacard_'+str(binN)+'_tchwh_'+masspoint+'.txt'
 def getgrid():
@@ -59,9 +69,11 @@ def getgrid():
 def getsignalscan(signalfile,nzbins):
     # open  files
     histname="h_histscan"
-    rootf = TFile(os.environ["analysis_output"]+"/"+signalfile)
-    rootf_jecup = TFile(os.environ["analysis_output"]+"/"+signalfile.replace("lnbb","lnbb_jecup"))
-    rootf_jecdn = TFile(os.environ["analysis_output"]+"/"+signalfile.replace("lnbb","lnbb_jecdn"))
+    rootf = TFile(os.environ["analysis_output"].replace('v22','v23')+"/"+signalfile)
+    #rootf_jecup = TFile(os.environ["analysis_output"]+"/"+signalfile.replace("lnbb","lnbb_jecup"))
+    #rootf_jecdn = TFile(os.environ["analysis_output"]+"/"+signalfile.replace("lnbb","lnbb_jecdn"))
+    rootf_jecup = TFile(os.environ["analysis_output"]+"/"+signalfile.replace("hists.root","jecup_hists.root"))
+    rootf_jecdn = TFile(os.environ["analysis_output"]+"/"+signalfile.replace("hists.root","jecdown_hists.root"))
     # grab 2d histograms with yields.
     scanhist = rootf.Get(histname)
     scanhist_jecup = rootf_jecup.Get(histname)
@@ -75,6 +87,10 @@ def getsignalscan(signalfile,nzbins):
     scanhist_scaledn  = rootf.Get('h_histscan_scaledn') 
     scanhist_trigup  = rootf.Get('h_histscan_trigup') 
     scanhist_trigdn  = rootf.Get('h_histscan_trigdn') 
+    scanhist_isrup  = rootf.Get('h_histscan_isrup') 
+    scanhist_isrdn  = rootf.Get('h_histscan_isrdn') 
+    scanhist_pileupup  = rootf.Get('h_histscan_pileupup') 
+    scanhist_pileupdn  = rootf.Get('h_histscan_pileupdn') 
     
     grid = getgrid() # print out the mass point string. 
     scandicts = [] # make a dictionary for masspoints
@@ -84,7 +100,9 @@ def getsignalscan(signalfile,nzbins):
         for mass in grid:
            # find the mass points and name for the datacard
             xbin = scanhist.GetXaxis().FindBin(mass[0]) 
-            ybin = scanhist.GetYaxis().FindBin(mass[1])         
+            ybin = scanhist.GetYaxis().FindBin(mass[1])        
+            #if mass[1] is 1: mass[1]=0
+            #if mass[0] is 126: mass[0]=125
             namestring=str(mass[0])+'_'+str(mass[1]) 
            # genmet resolution uncertainties.
             recoyield = scanhist.GetBinContent(xbin,ybin,zbin)
@@ -98,9 +116,11 @@ def getsignalscan(signalfile,nzbins):
             meterror = abs(recoyield-genyield)/2
             sysbtagsf = 0
             syslepsf=0
-            sysscale=0
+            sysscale=1
             systrig=0
             sysjec=0
+            sysisr=0
+            syspileup=0
             if centralyield:
                btagup = scanhist_btagsfup.GetBinContent(xbin,ybin,zbin)
                btagdn = scanhist_btagsfdn.GetBinContent(xbin,ybin,zbin)
@@ -112,13 +132,19 @@ def getsignalscan(signalfile,nzbins):
                trigup = scanhist_trigup.GetBinContent(xbin,ybin,zbin) 
                trigdn = scanhist_trigdn.GetBinContent(xbin,ybin,zbin) 
                systrig  =max(abs(trigup-centralyield)/centralyield,abs(trigdn-centralyield)/centralyield)+1
+               isrup = scanhist_isrup.GetBinContent(xbin,ybin,zbin) 
+               isrdn = scanhist_isrdn.GetBinContent(xbin,ybin,zbin) 
+               sysisr  =max(abs(isrup-centralyield)/centralyield,abs(isrdn-centralyield)/centralyield)+1
+               pileupup = scanhist_pileupup.GetBinContent(xbin,ybin,zbin) 
+               pileupdn = scanhist_pileupdn.GetBinContent(xbin,ybin,zbin) 
+               syspileup  =max(abs(pileupup-centralyield)/centralyield,abs(pileupdn-centralyield)/centralyield)+1
                jecup = scanhist_jecup.GetBinContent(xbin,ybin,zbin)
                jecdn = scanhist_jecdn.GetBinContent(xbin,ybin,zbin)
                sysjec = max(abs(jecup-centralyield)/centralyield,abs(jecdn-centralyield)/centralyield)+1 
                scandict[namestring]={'yield': averagedyield, 'stat': recoerror/centralyield+1, 'sysmet':meterror/centralyield+1
-                              ,'sysbtagsf':sysbtagsf ,'syslepsf':syslepsf, 'sysscale':sysscale, 'systrig':systrig, 'sysjec':sysjec}
+                              ,'sysbtagsf':sysbtagsf ,'syslepsf':syslepsf, 'sysscale':sysscale, 'systrig':systrig, 'sysjec':sysjec, 'sysisr':sysisr,'syspileup':syspileup}
             else:
-                 scandict[namestring]={'yield': averagedyield, 'stat': 1, 'sysmet': 1,'sysbtagsf':sysbtagsf ,'syslepsf':syslepsf, 'sysscale':sysscale, 'systrig':systrig, 'sysjec':sysjec}
+                 scandict[namestring]={'yield': averagedyield, 'stat': 1, 'sysmet': 1,'sysbtagsf':sysbtagsf ,'syslepsf':syslepsf, 'sysscale':sysscale, 'systrig':systrig, 'sysjec':sysjec, 'sysisr':sysisr,'syspileup':syspileup}
         scandicts.append(scandict)      
     return scandicts    
      
@@ -169,10 +195,12 @@ def getLimit(card):
 
 if __name__ == "__main__":
    # specify selection here to get a set of backgrounds
-   version='8'
-   zbins =2
-   selection="SR_SRMultiBin_V%s_yield_mbb_mct170_mt150_met100_twobtag_mix"%version
-   carddir = "cards_40fb_v%s"%version
+   version ='14'
+   zbins = 2
+   #selection="SR_mix_SRMultiBin_V%s_yield_mbb_mct170_mt150_met125_twobtag"%version
+   #selection="SR_mix_SRMultiBin_V0_yield_mbb_mct150_mt150_met100_twobtag"
+   selection="SR_mix_SRMultiBin_V4_yield_mbb_mct170_mt150_met125_twobtag"  # to draw money plot mbb.
+   carddir = "cards_moriond17_v%s"%version
    bkgs,err = getbackgrounds(selection) 
    # specify signal file here
    signalfile = "SMS_tchwh_lnbb_"+selection+"_hists.root"
@@ -192,15 +220,16 @@ if __name__ == "__main__":
        print "will save cards in %s"%carddir
 
    cards = []
-   sys ={'stat':[] , 'sysscale':[] , 'yield':[] , 'sysbtagsf':[] , 'syslepsf': [], 'sysmet':[],'systrig':[],'sysjec':[]} 
+   sys ={'stat':[] , 'sysscale':[] , 'yield':[] , 'sysbtagsf':[] , 'syslepsf': [], 'sysmet':[],'systrig':[],'sysjec':[],'sysisr':[],'syspileup':[]} 
 
    for zbin in range(1,zbins+1):
        print zbin
        for k,kinfo in scandicts[zbin-1].items():
        #for k,kinfo in scandicts[0].items():
            card = printcard(k,kinfo,zbin,bkgs,err,selection,carddir)
-   #    for key in kinfo.keys():
-   #        sys[key].append(kinfo[key])
+           for key in kinfo.keys():
+                  if 'sysbtagsf' in key and kinfo[key]<1.01: print kinfo[key]
+                  sys[key].append(kinfo[key])
 
-#   for item in sys.keys():
-#       print item,':', max(sys[item]), min(sys[item])
+   for item in sys.keys():
+       print item,':', max(sys[item]), min(sys[item])

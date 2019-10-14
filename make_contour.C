@@ -41,17 +41,18 @@ TGraph DrawContours(TGraph2D &g2, int color, int style){
 
 void make_contour(std::string model){
 
-  TFile *f = new TFile(Form("r-values_%s.root", model.c_str()), "UPDATE");
+  //TFile *f = new TFile(Form("r-values_%s.root", model.c_str()), "UPDATE");
+  TFile *f = new TFile(Form("~/public_html/CLS_CSUL.root"), "UPDATE");
   f->cd();
 
-  TH2 *hExp_smooth   = (TH2*)f->Get("hExp_smooth");
-  TH2 *hObs_smooth   = (TH2*)f->Get("hObs_smooth");
-  TH2 *hObs1m_smooth   = (TH2*)f->Get("hObs1m_smooth");
-  TH2 *hObs1p_smooth   = (TH2*)f->Get("hObs1p_smooth");
-  TH2 *hExp1m_smooth = (TH2*)f->Get("hExp1m_smooth");
-  TH2 *hExp2m_smooth = (TH2*)f->Get("hExp2m_smooth");
-  TH2 *hExp1p_smooth = (TH2*)f->Get("hExp1p_smooth");
-  TH2 *hExp2p_smooth = (TH2*)f->Get("hExp2p_smooth");
+  TH2 *hExp_smooth   = (TH2*)f->Get("contourplot");
+  TH2 *hObs_smooth   = (TH2*)f->Get("massplane_obs");
+  TH2 *hObs1m_smooth   = (TH2*)f->Get("massplane_obs_dn");
+  TH2 *hObs1p_smooth   = (TH2*)f->Get("massplane_obs_up");
+  TH2 *hExp1m_smooth = (TH2*)f->Get("massplane_exp_dn");
+  TH2 *hExp2m_smooth = (TH2*)f->Get("massplane_exp_dn2");
+  TH2 *hExp1p_smooth = (TH2*)f->Get("massplane_exp_up");
+  TH2 *hExp2p_smooth = (TH2*)f->Get("massplane_exp_up2");
 
   if(!hExp_smooth) std::cout << "hist not found" << std::endl;
 

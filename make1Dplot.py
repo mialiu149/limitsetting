@@ -1,7 +1,7 @@
 import ROOT, array
 import sys, glob
 ROOT.gROOT.SetBatch(True)
-lumi = 40
+lumi = 35.9
 
 def get1Dlimit(fn): 
     f = ROOT.TFile.Open(fn)
@@ -19,7 +19,7 @@ def get1Dxsec(charginomass):
     return sigma
     
 def main():
-    version = "scan40fbv4"
+    version = "limits_moriond17_v5"
     dir="/home/users/mliu/CMSSW_7_4_7/src/limitsetting_whmet/"+version+"/"
     #chargino_masses =[126,150,175,200,225,250,275,300,325,350,375,400] 
     chargino_masses =[126,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500,525,550,575,600,625,650,675,700] 
@@ -37,13 +37,14 @@ def main():
     sigmas = []
     
     for chargino in chargino_masses:
+#        if chargino is 126: chargino=125
         fn = dir+'limit_tchwh_'+str(chargino)+'_1.root'
-        fnb = dir.replace("v4","v8")+'limit_tchwh_'+str(chargino)+'_1.root'
+        fnb = dir.replace("v4","v0")+'limit_tchwh_'+str(chargino)+'_1.root'
         limitsdic = get1Dlimit(fn)
-        limitsdicb = get1Dlimit(fnb)
+#        limitsdicb = get1Dlimit(fnb)
         xsec = get1Dxsec(chargino)
-        #obs.append(limitsdic['obs']*xsec)
-        obs.append(limitsdicb['exp']*xsec)
+        obs.append(limitsdic['obs']*xsec)
+        #obs.append(limitsdicb['exp']*xsec)
         #exp.append(limitsdic['exp']*xsec)
         exp.append(limitsdic['exp']*xsec)
 #        if chargino is 350:
@@ -62,26 +63,26 @@ def main():
         p2s[i]=p2s[i]-exp[i]
     
     ROOT.gStyle.SetOptStat(0)
-    c1 = ROOT.TCanvas("c1", "", 800, 800)
+    c1 = ROOT.TCanvas("c1", "", 800, 880)
     c1.cd()
     padt = ROOT.TPad("p_tex", "p_tex", 0.0, 0.0, 1.0, 1.0)
     padt.SetTopMargin(0.1)
-    padt.SetBottomMargin(0.1)
+    padt.SetBottomMargin(0.15)
     padt.SetRightMargin(0.05)
-    padt.SetLeftMargin(0.15)
+    padt.SetLeftMargin(0.18)
     padt.SetTickx()
     padt.SetTicky()
     padt.Draw()
     padt.cd()
     padt.SetLogy() 
-    h = ROOT.TH2F("h","h",48,100,700,1000,0.001,1000)
+    h = ROOT.TH2F("h","h",48,100,700,1000,0.01,1000)
     h.SetTitle("")
     h.GetXaxis().SetTitle("m_{#tilde{#chi}^{#pm}_{1}} = m_{#tilde{#chi}^{0}_{2}} [GeV]")
-    h.GetYaxis().SetTitle("#sigma limit at 95% CL [pb]")
+    h.GetYaxis().SetTitle("Cross section [pb]")
     h.GetXaxis().SetLabelSize(0.04)
     h.GetYaxis().SetLabelSize(0.04)
-    h.GetXaxis().SetTitleSize(0.042)
-    h.GetYaxis().SetTitleSize(0.042)
+    h.GetXaxis().SetTitleSize(0.06)
+    h.GetYaxis().SetTitleSize(0.06)
     h.GetXaxis().SetTitleOffset(1.0)
     h.GetYaxis().SetTitleOffset(1.5)
     h.Draw()
@@ -110,10 +111,10 @@ def main():
     gobs = ROOT.TGraph(len(chargino_masses), array.array('d', chargino_masses), array.array('d', obs))
     gobs.SetMarkerStyle(ROOT.kFullCircle)
     gobs.SetMarkerSize(1.5)
-    gobs.SetMarkerColor(ROOT.kBlue)
+    gobs.SetMarkerColor(ROOT.kBlack)
     gobs.SetLineWidth(3)
-    gobs.SetLineColor(ROOT.kBlue)
-    gobs.Draw("L")
+    gobs.SetLineColor(ROOT.kBlack)
+    gobs.Draw("PL")
    
     prctex = ROOT.TLatex(0.45,0.83, "pp #rightarrow #tilde{#chi}^{#pm}_{1} #tilde{#chi}^{0}_{2}; m_{#tilde{#chi}^{0}_{1}} = 1 GeV");
     prctex.SetNDC()    
@@ -143,7 +144,7 @@ def main():
     cmstexbold.SetTextFont(61)
     cmstexbold.Draw()
     
-    cmstexprel = ROOT.TLatex(0.29,0.91, "Preliminary" )
+    cmstexprel = ROOT.TLatex(0.29,0.91, "" )
     cmstexprel.SetNDC()
     cmstexprel.SetTextSize(0.03)
     cmstexprel.SetLineWidth(2)
@@ -157,13 +158,26 @@ def main():
     l1.SetShadowColor(ROOT.kWhite)
     l1.SetFillColor(ROOT.kWhite)
 #    l1.SetHeader("#sigma exclusion limit, M_{#tilde{#chi}^{0}_{1}} = 1 GeV")
-    #l1.AddEntry(gobs , "Observed", "lp")
-    l1.AddEntry(gobs , "b pt bin", "l")
-    l1.AddEntry(gexp , "40fb", "l")
-    l1.AddEntry(gr_s1b , "Expected #pm 1 #sigma", "f")
-    l1.AddEntry(gr_s2b , "Expected #pm 2 #sigma", "f")
-    l1.AddEntry(g_xsec_c1n2 , "Theoretical #sigma_{NLO+NLL}","f")
+    l1.AddEntry(gobs , "Observed limit", "lp")
+    #l1.AddEntry(gobs , "ICHEP selection", "l")
+    l1.AddEntry(gexp , "Expected limit", "l")
+    l1.AddEntry(gr_s1b , "Expected #pm 1 s.d._{exp}", "f")
+    l1.AddEntry(gr_s2b , "Expected #pm 2 s.d._{exp}", "f")
+    #l1.AddEntry(g_xsec_c1n2 , "Theoretical #sigma_{NLO+NLL}","f")
+    l1.AddEntry(g_xsec_c1n2 , "#sigma_{NLO+NLL} #pm 1 s.d._{theory}","f")
     l1.Draw()
+    fg = ROOT.TFile("limits_TChiWH_1D.root","CREATE")
+    fg.cd()
+    gexp.SetName("gExp_1d")
+    gexp.Write() 
+    gobs.SetName("gObs_1d")
+    gobs.Write() 
+    gr_s1b.SetName("gExp_pm1sigma_1d")
+    gr_s2b.SetName("gExp_pm2sigma_1d")
+    g_xsec_c1n2.SetName("g_xsec_c1n2")
+    gr_s1b.Write()
+    gr_s2b.Write()
+    g_xsec_c1n2.Write()
     '''
     LExp1 = ROOT.TGraphAsymmErrors(2)
     LExp1.SetFillColor(ROOT.kYellow)

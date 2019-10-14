@@ -21,12 +21,12 @@ void make_rValues(std::string model, int m1, int m2){
   //setup file to hold r-values if it doesn't already exist
   TFile *f_temp = new TFile(Form("r-values_%s.root", model.c_str()), "NEW");
   if(f_temp){
-    int m1_max = 724;
-    int m1_min = 124;
-    int m2_max = 374;
-    int m2_min = -1;
-    int m1_div = 25;
-    int m2_div = 25;
+    double m1_max = 712.5;
+    double m1_min = -12.5;
+    double m2_max = 312.5;
+    double m2_min = -12.5;
+    double m1_div = 25;
+    double m2_div = 25;
 
     int nbinsx = (m1_max - m1_min)/m1_div;
     int nbinsy = (m2_max - m2_min)/m2_div;
@@ -103,6 +103,7 @@ void make_rValues(std::string model, int m1, int m2){
   Fill2d(hExp2m, rm2s   , m1, m2);  
   Fill2d(hExp1p, rp1s   , m1, m2);  
   Fill2d(hExp2p, rp2s   , m1, m2);  
+  std::cout<<"massses:"<< m1 <<":"<<m2<<":"<<limit <<std::endl;
  //Fill2d(hSig  , sig    , m1, m2);  
 /*
   hExp->Fill(m1,m2,rmedian);
